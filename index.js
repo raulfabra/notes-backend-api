@@ -1,8 +1,16 @@
+import dotenv from 'dotenv'
+import connectDB from './mongo.js'
 import express from 'express'
 import logger from './loggerMiddleware.js'
+import cors from 'cors'
+import Note from './models/Note.js'
+
+dotenv.config()
+connectDB()
+const app = express()
 
 let notes = [
-  {
+  /* {
     id: 1,
     content: 'loremIpsun loremIpsun loremIpsun loremIpsun loremIpsun loremIpsun loremIpsun loremIpsun loremIpsun',
     data: '2024-05-31',
@@ -25,18 +33,20 @@ let notes = [
     content: 'GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer GustavoAdolfoBequer',
     data: '1963-09-02',
     important: true
-  }
+  } */
 ]
 
-const app = express()
+app.use(cors()) // Esto son middleWare imprescindible para que puedan acceder desde el exterior a nuestra api lanzada en producción. Esto se podría configurar para determinar que origenes (endopoints) queremos que sean accesibles, etc. Asi tal cual es accesible en toda la API. Pd: De todas maneras si se quiere hacer esto es mejor utilizar JWT, tokens, authentificator. Porque en el fondo el origen es muy facil hackear, dato de un profesional.
 app.use(express.json())
-app.use(logger)
+app.use(logger) // Los middlewares tambien se pueden utilizar a nivel de cada PATH, entremedias de el PATH y el CALLBACK.
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World</h1>')
 })
 app.get('/api/notes', (request, response) => {
-  response.json(notes)
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
 })
 app.get('/api/notes/:id', (request, response) => {
   const id = Number(request.params.id)
@@ -81,7 +91,7 @@ app.use((request, response, next) => {
   })
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
