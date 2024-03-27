@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 
 function connectDB () {
   const connectionString = process.env.MONGO_DB_URI
-  console.log('URI .env : ', connectionString)
   // conexión a mongoDB
   mongoose.connect(connectionString)
     .then(() => {
