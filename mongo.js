@@ -9,6 +9,11 @@ function connectDB () {
     }).catch(err => {
       console.log(err)
     })
+
+  // desconexión si encauta un Error.
+  process.on('uncaughtException', () => {
+    mongoose.connection.close()
+  })
 }
 
 export default connectDB
